@@ -1,0 +1,29 @@
+# Netlify build settings. Connected to the GitHub repository: every push to the
+# production branch rebuilds and redeploys the site.
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  # Needs Node 22.18+ (the build runs TypeScript natively). Set the exact version here.
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Security headers for every page.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    X-Frame-Options = "SAMEORIGIN"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-src https://www.openstreetmap.org; connect-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
+
+# Hashed assets never change, so they can be cached for a year.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

@@ -8,9 +8,12 @@ import {
   buildCopy,
   composeEnquiryText,
   formatMoney,
+  maskDMY,
   nightsBetween,
+  parseDMY,
   quote,
   todayInZone,
+  toDMY,
   validateEnquiry,
 } from "/assets/booking-logic.js";
 
@@ -32,13 +35,20 @@ if (host && configEl) {
   const today = () => todayInZone(policy.timeZone);
 
   const field = (name) => form.elements.namedItem(name)?.value ?? "";
+  // Dates are typed as dd/mm/yyyy; the rules and the server work with YYYY-MM-DD.
+  // Text that is not a real date is passed on as typed, so validation reports it.
+  const dateField = (name) => {
+    const typed = field(name).trim();
+    return parseDMY(typed) ?? typed;
+  };
+  const picker = (name) => host.querySelector(`[data-picker-for="${name}"]`);
 
   const readForm = () => {
     const checked = form.querySelector('input[name="roomType"]:checked');
     return {
       roomType: checked ? checked.value : "",
-      checkIn: field("checkIn"),
-      checkOut: field("checkOut"),
+      checkIn: dateField("checkIn"),
+      checkOut: dateField("checkOut"),
       rooms: field("rooms"),
       adults: field("adults"),
       children: field("children"),
@@ -68,8 +78,10 @@ if (host && configEl) {
 
     // Earliest check-out is one night after check-in.
     const base = d.checkIn && nightsBetween(today(), d.checkIn) !== null ? d.checkIn : today();
-    checkOut.min = addDays(base, 1) ?? "";
-    checkIn.min = today();
+    const outPicker = picker("checkOut");
+    const inPicker = picker("checkIn");
+    if (outPicker) outPicker.min = addDays(base, 1) ?? "";
+    if (inPicker) inPicker.min = today();
 
     setSummary("nights", validNights ?? "—");
     setSummary("guests", Number.isFinite(guests) && guests > 0 ? String(guests) : "—");
@@ -172,6 +184,40 @@ if (host && configEl) {
       return ok;
     }
   };
+
+  // ----- Date fields: dd/mm/yyyy typing mask and calendar button ---------------------------
+  host.querySelectorAll("[data-date-input]").forEach((input) => {
+    input.addEventListener("input", (event) => {
+      // Insert the slashes while typing; leave deletions alone so backspace works naturally.
+      if (!(event.inputType && event.inputType.startsWith("delete"))) {
+        const masked = maskDMY(input.value);
+        if (masked !== input.value) input.value = masked;
+      }
+      // A complete date: explain a bad check-in/check-out pair right away.
+      if (input.value.length === 10) dateHint();
+    });
+  });
+  host.querySelectorAll("[data-date-picker]").forEach((button) => {
+    const name = button.dataset.datePicker;
+    const native = picker(name);
+    const input = form.elements.namedItem(name);
+    if (!native || !input) return;
+    button.addEventListener("click", () => {
+      native.value = parseDMY(input.value) ?? "";
+      try {
+        native.showPicker();
+      } catch {
+        // Older browsers: focus the typed field instead.
+        input.focus();
+      }
+    });
+    native.addEventListener("change", () => {
+      if (!native.value) return;
+      input.value = toDMY(native.value);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  });
 
   // ----- Submit -------------------------------------------------------------------------
   form.addEventListener("input", () => {

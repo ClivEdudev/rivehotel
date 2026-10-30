@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1250" width="1000" height="1250" role="img"><title>Illustration: deluxe room interior (placeholder, not a photograph of the hotel)</title><defs><linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9cbbd"/><stop offset="1" stop-color="#9ba69a"/></linearGradient><linearGradient id="view" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d79062"/><stop offset="1" stop-color="#f4f0e8"/></linearGradient></defs>
+      <rect width="1000" height="1250" fill="url(#wall)"/><path d="M330 690V340A170 170 0 0 1 670 340V690Z" fill="url(#view)"/><path d="M500 170V690M330 430H670" stroke="#c9cbbd" stroke-width="8" opacity=".7"/>
+      <rect y="1010" width="1000" height="240" fill="#4e6f68"/>
+      <ellipse cx="500" cy="1130" rx="400" ry="70" fill="#7c4a2c" opacity=".4"/>
+      <rect x="220" y="650" width="560" height="260" rx="14" fill="#1f4a4a"/>
+      <rect x="190" y="840" width="620" height="190" rx="18" fill="#f4f0e8"/>
+      <rect x="190" y="920" width="620" height="110" rx="10" fill="#7c4a2c" opacity=".85"/>
+      <rect x="260" y="790" width="210" height="80" rx="30" fill="#f4f0e8" stroke="#7c4a2c" stroke-opacity=".35"/>
+      <rect x="530" y="790" width="210" height="80" rx="30" fill="#f4f0e8" stroke="#7c4a2c" stroke-opacity=".35"/>
+      <rect x="105" y="880" width="80" height="140" fill="#1f4a4a"/><circle cx="145" cy="830" r="42" fill="#d79062" opacity=".9"/><rect x="815" y="880" width="80" height="140" fill="#1f4a4a"/><circle cx="855" cy="830" r="42" fill="#d79062" opacity=".9"/></svg>

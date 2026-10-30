@@ -67,11 +67,34 @@ export function nightsBetween(checkIn, checkOut) {
   return a && b ? Math.round((b.getTime() - a.getTime()) / DAY_MS) : null;
 }
 
-/** One date format for the whole site, e.g. "Oct 30, 2026" (en) or "30 окт. 2026 г." (ru). */
-export function formatDate(iso, locale) {
+/** One date format for the whole site and its emails: dd/mm/yyyy, as is usual in Uzbekistan. */
+export function formatDate(iso, _locale) {
   const date = parseISODate(iso);
   if (!date) return "";
-  return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(date);
+  return toDMY(iso);
+}
+
+/** "YYYY-MM-DD" -> "dd/mm/yyyy" ("" when the date is not real). */
+export function toDMY(iso) {
+  if (!parseISODate(iso)) return "";
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+/** "dd/mm/yyyy" (also accepts "." or "-" as separators) -> "YYYY-MM-DD", or null if not a real date. */
+export function parseDMY(value) {
+  const match = /^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/.exec(String(value ?? "").trim());
+  if (!match) return null;
+  const iso = `${match[3]}-${match[2].padStart(2, "0")}-${match[1].padStart(2, "0")}`;
+  return parseISODate(iso) ? iso : null;
+}
+
+/** Formats typed digits as dd/mm/yyyy while the guest types, e.g. "3011" -> "30/11". */
+export function maskDMY(value) {
+  const digits = String(value ?? "").replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 }
 
 export function formatMoney(amount, currency) {
